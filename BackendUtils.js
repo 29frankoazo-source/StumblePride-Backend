@@ -13,8 +13,8 @@ const { generateAuthPayload } = require("./SharedUtils");
 const SharedData = require("./shared.json");
 
 
-const isAllSkinsUnlocked = true;
-const isAllEmotesUnlocked = true;
+const isAllSkinsUnlocked = false;
+const isAllEmotesUnlocked = false;
 const isAllAnimationsUnlocked = true;
 const isAllFootstepsUnlocked = true;
 const isAllActionEmotesUnlocked = true;
@@ -1031,8 +1031,8 @@ class UserModel {
     // Region: lowercase delle stesse 2 lettere del country - supporta tutti i paesi
     const region = country.toLowerCase();
     const now = new Date();
-    const userId = Math.floor(Math.random() * 999999);
-    const username = 'Priz#' + BackendUtils.GenCaracters(4).toUpperCase();
+    const userId = Math.floor(Math.random() * 99999);
+    const username = 'StumblePride' + BackendUtils.GenCaracters(5).toUpperCase();
     
     const user = {
       id: userId,
@@ -3751,6 +3751,60 @@ colourData: {
     }
   ];
 
+  static seasons = [
+    {
+      awards: [
+        { amount: 1, awardId: 1, awardJson: { id: "SKIN330" }, type: "SKIN", xp: 5 },
+        { amount: 100, awardId: 2, awardJson: { name: "gems" }, type: "CURRENCY", xp: 10 },
+        { amount: 1, awardId: 3, awardJson: { id: "SKIN438" }, type: "SKIN", xp: 15 },
+        { amount: 1, awardId: 4, awardJson: { id: "Emote047_XmasSkull" }, type: "EMOTE", xp: 20 },
+        { amount: 50, awardId: 5, awardJson: { name: "dust" }, type: "CURRENCY", xp: 25 },
+        { amount: 1, awardId: 6, awardJson: { id: "emote_thumb" }, type: "EMOTE", xp: 30 },
+        { amount: 50, awardId: 7, awardJson: { name: "dusy" }, type: "CURRENCY", xp: 35 },
+        { amount: 1, awardId: 8, awardJson: { id: "SKIN210" }, type: "SKIN", xp: 40 },
+        { amount: 1, awardId: 9, awardJson: { id: "Emote060_HoldingTears" }, type: "EMOTE", xp: 45 },
+        { amount: 1, awardId: 10, awardJson: { id: "SKIN123" }, type: "SKIN", xp: 50 },
+        { amount: 20, awardId: 11, awardJson: { name: "gems" }, type: "CURRENCY", xp: 55 },
+        { amount: 1, awardId: 12, awardJson: { id: "Emote032_RedCard" }, type: "EMOTE", xp: 60 },
+        { amount: 50, awardId: 13, awardJson: { name: "dust" }, type: "CURRENCY", xp: 65 },
+        { amount: 1, awardId: 14, awardJson: { id: "SKIN148" }, type: "SKIN", xp: 70 },
+        { amount: 1, awardId: 15, awardJson: { id: "emote_dab" }, type: "EMOTE", xp: 75 },
+        { amount: 75, awardId: 16, awardJson: { name: "dust" }, type: "CURRENCY", xp: 80 },
+        { amount: 20, awardId: 17, awardJson: { name: "gems" }, type: "CURRENCY", xp: 85 },
+        { amount: 1, awardId: 18, awardJson: { id: "emote_go" }, type: "EMOTE", xp: 90 },
+        { amount: 50, awardId: 19, awardJson: { name: "dust" }, type: "CURRENCY", xp: 95 },
+        { amount: 1, awardId: 20, awardJson: { id: "SKIN365" }, type: "SKIN", xp: 100 },
+        { amount: 10, awardId: 21, awardJson: { name: "gems" }, type: "CURRENCY", xp: 105 },
+        { amount: 50, awardId: 22, awardJson: { name: "gems" }, type: "CURRENCY", xp: 110 },
+        { amount: 1, awardId: 23, awardJson: { id: "emote_skull" }, type: "EMOTE", xp: 115 },
+        { amount: 1, awardId: 24, awardJson: { id: "SKIN195" }, type: "SKIN", xp: 120 },
+        { amount: 50, awardId: 25, awardJson: { name: "dust" }, type: "CURRENCY", xp: 125 },
+        { amount: 20, awardId: 26, awardJson: { name: "gems" }, type: "CURRENCY", xp: 130 },
+        { amount: 1, awardId: 27, awardJson: { id: "SKIN51" }, type: "SKIN", xp: 135 },
+        { amount: 1, awardId: 28, awardJson: { id: "Emote057_PartyPop" }, type: "EMOTE", xp: 140 },
+        { amount: 50, awardId: 29, awardJson: { name: "dust" }, type: "CURRENCY", xp: 145 },
+        { amount: 1, awardId: 30, awardJson: { id: "SKIN444" }, type: "SKIN", xp: 150 },
+        { amount: 1, awardId: 999, awardJson: { id: "SKIN375" }, type: "SKIN", xp: 999 }
+      ],
+      backgroundImageKey: "",
+      descriptionKey: "",
+      endTime: "2026-04-03T10:00:00",
+      id: 1,
+      isEnabled: true,
+      nameKey: "TOURNAMENTS",
+      claimSeasonReward: true,
+      startTime: "2024-03-06T10:00:00"
+    }
+  ];
+
+  static getSeasons(req, res) {
+    try {
+      res.status(200).json(TournamentXController.seasons);
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+
   static getActive(req, res) {
     try {
       const now = new Date();
@@ -3964,6 +4018,204 @@ static async finish(req, res) {
     res.status(500).json({ mensagem: "erro interno do servidor" });
   }
 }
+
+  static async getSeasonProgress(req, res) {
+    try {
+      const { seasonId } = req.params;
+      const { user } = req;
+
+      const foundUser = await UserModel.findByStumbleId(user.stumbleId);
+
+      if (!foundUser) {
+        return res.status(404).json("putz vc n existe");
+      }
+
+      let userSeasonData = foundUser.tournamentSeasons?.find(season =>
+        season.seasonId === parseInt(seasonId)
+      );
+
+      if (!userSeasonData) {
+        userSeasonData = {
+          seasonId: parseInt(seasonId),
+          xp: 0,
+          claimedAwards: []
+        };
+
+        if (!foundUser.tournamentSeasons) {
+          foundUser.tournamentSeasons = [userSeasonData];
+        } else {
+          foundUser.tournamentSeasons.push(userSeasonData);
+        }
+
+        await UserModel.update(user.stumbleId, {
+          tournamentSeasons: foundUser.tournamentSeasons
+        });
+      }
+
+      const seasonProgress = {
+        seasonId: parseInt(seasonId),
+        userId: foundUser.id,
+        xp: userSeasonData.xp,
+        claimedAwards: userSeasonData.claimedAwards
+      };
+
+      res.status(200).json(seasonProgress);
+
+    } catch (err) {
+      Console.error('Tournament', 'Get season progress error:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  }
+
+
+  static async claimSeasonReward(req, res) {
+    try {
+      const { seasonId, awardId } = req.params;
+      const { user } = req;
+
+      const foundUser = await UserModel.findByStumbleId(user.stumbleId);
+      if (!foundUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const season = TournamentXController.seasons.find(s => s.id === parseInt(seasonId));
+      if (!season) {
+        return res.status(404).json({ message: "Season not found" });
+      }
+
+      const award = season.awards.find(a => a.awardId === parseInt(awardId));
+      if (!award) {
+        return res.status(404).json({ message: "Award not found" });
+      }
+
+      let userSeasonData = foundUser.tournamentSeasons?.find(s => s.seasonId === parseInt(seasonId));
+
+      if (!userSeasonData) {
+        userSeasonData = {
+          seasonId: parseInt(seasonId),
+          xp: 0,
+          claimedAwards: []
+        };
+
+        if (!foundUser.tournamentSeasons) {
+          foundUser.tournamentSeasons = [userSeasonData];
+        } else {
+          foundUser.tournamentSeasons.push(userSeasonData);
+        }
+
+        await UserModel.update(user.stumbleId, {
+          tournamentSeasons: foundUser.tournamentSeasons
+        });
+      }
+
+      if (userSeasonData.xp < award.xp) {
+        return res.status(400).json({ message: "Insufficient XP to claim this award" });
+      }
+
+      if (userSeasonData.claimedAwards.includes(parseInt(awardId))) {
+        return res.status(400).json({ message: "Award already claimed" });
+      }
+
+      let rewards = [];
+
+      if (award.type === "CURRENCY") {
+        const currencyName = award.awardJson.name;
+        const currencyReward = {
+          amount: award.amount,
+          duplicateCurrencyAmount: 0,
+          nestedRewards: [],
+          sourceType: "TOURNAMENT_SEASON",
+          type: "CURRENCY",
+          typeInfo: currencyName
+        };
+        rewards.push(currencyReward);
+        await UserModel.addBalance(user.stumbleId, currencyName, award.amount);
+      } else if (award.type === "SKIN") {
+        const skinId = award.awardJson.id;
+        const wheelReward = {
+          amount: 1,
+          duplicateCurrencyAmount: 0,
+          nestedRewards: [
+            {
+              amount: 1,
+              duplicateCurrencyAmount: 0,
+              nestedRewards: [],
+              sourceType: "UNKNOWN",
+              type: "SKIN",
+              typeInfo: skinId
+            }
+          ],
+          sourceType: "TOURNAMENT_SEASON",
+          type: "WHEEL",
+          typeInfo: "TOURNAMENT_SEASON_WHEEL"
+        };
+        rewards.push(wheelReward);
+        await UserModel.addSkin(user.stumbleId, skinId);
+      } else if (award.type === "EMOTE") {
+        const emoteId = award.awardJson.id;
+        const wheelReward = {
+          amount: 1,
+          duplicateCurrencyAmount: 0,
+          nestedRewards: [
+            {
+              amount: 1,
+              duplicateCurrencyAmount: 0,
+              nestedRewards: [],
+              sourceType: "UNKNOWN",
+              type: "EMOTE",
+              typeInfo: emoteId
+            }
+          ],
+          sourceType: "TOURNAMENT_SEASON",
+          type: "WHEEL",
+          typeInfo: "TOURNAMENT_SEASON_WHEEL"
+        };
+        rewards.push(wheelReward);
+        await database.addToUserArray({ stumbleId: user.stumbleId }, 'emotes', emoteId);
+      } else if (award.type === "FOOTSTEPS") {
+        const footstepId = award.awardJson.id;
+        const wheelReward = {
+          amount: 1,
+          duplicateCurrencyAmount: 0,
+          nestedRewards: [
+            {
+              amount: 1,
+              duplicateCurrencyAmount: 0,
+              nestedRewards: [],
+              sourceType: "UNKNOWN",
+              type: "FOOTSTEPS",
+              typeInfo: footstepId
+            }
+          ],
+          sourceType: "TOURNAMENT_SEASON",
+          type: "WHEEL",
+          typeInfo: "TOURNAMENT_SEASON_WHEEL"
+        };
+        rewards.push(wheelReward);
+        await database.addToUserArray({ stumbleId: user.stumbleId }, 'footsteps', footstepId);
+      }
+
+      userSeasonData.claimedAwards.push(parseInt(awardId));
+      await UserModel.update(user.stumbleId, {
+        tournamentSeasons: foundUser.tournamentSeasons.map(s =>
+          s.seasonId === parseInt(seasonId) ? userSeasonData : s
+        )
+      });
+
+      const updatedUser = await UserModel.findByStumbleId(user.stumbleId);
+      res.status(200).json({
+        User: updatedUser,
+        Rewards: rewards
+      });
+
+    } catch (err) {
+      Console.error("TournamentX", "Error claiming season reward:", err);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+  
+
+
 }
 
 class SocialController {
