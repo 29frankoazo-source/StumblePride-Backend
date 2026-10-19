@@ -1,0 +1,1 @@
+so if u want the cloudflare to connect use in Security -> Custom Rules -> (http.host eq "api.stumblepriz.online" and http.request.headers["x-prox-cloudflare"][0] ne "R1*lD^N1F~Yiwu~9HyCh3mE;GBt+I^^6P.0oOQj8HQT,~w1?o;k+K6#uoHl+E,o@ZIB+3*R%oMC:-sh0f,dZSIQGl4e") -> Block make sure u change with ur secrets or api link
