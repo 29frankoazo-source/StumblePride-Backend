@@ -18,6 +18,42 @@ function pickBody(body, ...keys) {
   return undefined;
 }
 
+function pickRequestedUsername(body, depth = 0) {
+  if (body == null || depth > 4) return undefined;
+
+  if (typeof body === "string") {
+    const trimmed = body.trim();
+    if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) return undefined;
+    try { return pickRequestedUsername(JSON.parse(trimmed), depth + 1); }
+    catch { return undefined; }
+  }
+
+  if (Array.isArray(body)) {
+    for (const value of body) {
+      const found = pickRequestedUsername(value, depth + 1);
+      if (found !== undefined) return found;
+    }
+    return undefined;
+  }
+
+  if (typeof body !== "object") return undefined;
+  const accepted = new Set(["username", "newusername", "requestedusername", "name", "newname", "displayname", "newdisplayname"]);
+  const nested = new Set(["data", "payload", "user", "profile", "update", "updates", "request", "body", "input", "args", "parameters"]);
+  for (const [key, value] of Object.entries(body)) {
+    const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
+    if (accepted.has(normalized) && (typeof value === "string" || typeof value === "number")) {
+      return String(value);
+    }
+  }
+  for (const [key, value] of Object.entries(body)) {
+    const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
+    if (nested.has(normalized) && value && typeof value === "object") {
+      const found = pickRequestedUsername(value, depth + 1);
+      if (found !== undefined) return found;
+    }
+  }
+  return undefined;
+}
 function normalizeActionEmote(v) {
   if (v === undefined || v === null || v === "") return null;
   if (typeof v === "number") return null;
@@ -361,7 +397,7 @@ const LobbyController = {
       const user = await requireUser(req, res);
       if (!user) return;
 
-      const rawInput = pickBody(req.body, "Username", "username", "newUsername", "name");
+      const rawInput = pickRequestedUsername(req.body);
       if (!rawInput || !String(rawInput).trim()) {
         logLobby("updateusername", false, "empty", Date.now() - t0);
         return res.status(409).json({ message: "nome non disponibile" });
