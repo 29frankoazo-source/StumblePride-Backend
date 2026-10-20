@@ -1879,6 +1879,7 @@ class UserController {
       const photonJwt = await generatePhotonJwt(user);
 
       if (user.isBanned) {
+        Console.warn("Login", "Rejected because the resolved or newly created user has isBanned=true");
         return res.status(403).send("BANNED");
       }
 

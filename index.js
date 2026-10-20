@@ -776,7 +776,10 @@ app.post("/user/login", async (req, res, next) => {
     if (deviceid) {
       try {
         const ban = await getBanByDeviceId(deviceid);
-        if (ban) return res.status(403).json(bannedPayload(ban.banReason));
+        if (ban) {
+          console.warn("[LOGIN] rejected: device ID matched the separate bans collection");
+          return res.status(403).json(bannedPayload(ban.banReason));
+        }
       } catch (banErr) {
         console.warn("[LOGIN] ban check skipped:", banErr && banErr.message ? banErr.message : banErr);
       }
@@ -784,6 +787,7 @@ app.post("/user/login", async (req, res, next) => {
       try {
         const user = await UserModel.findByDeviceId(deviceid);
         if (user && user.isBanned === true) {
+          console.warn("[LOGIN] rejected: existing Users record has isBanned=true");
           return res.status(403).json(bannedPayload(user.banReason));
         }
       } catch (banUserErr) {
@@ -1066,6 +1070,7 @@ app.post("/api/v1/userLoginExternal", async (req, res, next) => {
       try {
         const user = await UserModel.findByDeviceId(deviceid);
         if (user && user.isBanned === true) {
+          console.warn("[LOGIN] rejected: existing Users record has isBanned=true");
           return res.status(403).json(bannedPayload(user.banReason));
         }
       } catch (banUserErr) {
