@@ -79043,41 +79043,13 @@
       },
       "SkinOfferCost" : 450,
       "SocialLinks" : {
-         "CountrySettings" : [
-            {
-               "Country" : "BR",
-               "Links" : [
-                  {
-                     "ID" : "discord",
-                     "Url" : "https://discord.gg/stumbleguysbr"
-                  }
-               ]
-            }
-         ],
-         "EnableSocialLinks" : true,
-         "GlobalLinks" : [
-            {
-               "ID" : "discord",
-               "Url" : "https://discord.gg/Td6gSuzSwt"
-            },
-            {
-               "ID" : "tiktok",
-               "Url" : "https://www.tiktok.com/@stumbleguystt"
-            },
-            {
-               "ID" : "instagram",
-               "Url" : "https://www.instagram.com/stumbleguys/"
-            },
-            {
-               "ID" : "youtube",
-               "Url" : "https://www.youtube.com/c/StumbleGuys"
-            },
-            {
-               "ID" : "twitch",
-               "Url" : "https://www.twitch.tv/stumbleguys"
-            }
-         ]
-      },
+           "CountrySettings" : [],
+           "EnableSocialLinks" : true,
+           "GlobalLinks" : [
+              { "ID" : "discord", "Url" : "https://discord.gg/3VhSJ5jEbG" },
+              { "ID" : "tiktok", "Url" : "https://www.tiktok.com/@frankovfx?_r=1&_t=ZG-9AiU3X9qVw8" }
+           ]
+        },
       "SplitScreen" : {
          "Platforms" : [ "xbox", "playstation" ]
       },
