@@ -14,7 +14,7 @@ const SharedData = require("./shared.json");
 
 
 const isAllSkinsUnlocked = false;
-const isAllEmotesUnlocked = true;
+const isAllEmotesUnlocked = false;
 const isAllAnimationsUnlocked = true;
 const isAllFootstepsUnlocked = true;
 const isAllActionEmotesUnlocked = true;
@@ -2995,11 +2995,33 @@ class NewsController {
         .sort({ timestamp: -1 })
         .toArray();
 
-      const news = newsList.map(news => ({
-        Header: news.header,
-        Message: news.message,
-        TimeStamp: news.timestamp
-      }));
+      const news = newsList.map((item, index) => {
+        const timestamp = item.timestamp ?? item.Timestamp ?? item.timeStamp ?? item.TimeStamp ?? null;
+        const targetUrl = item.targetUrl ?? item.TargetUrl ?? item.link ?? item.Link ?? "";
+        const imagePath = item.imagePath ?? item.ImagePath ?? item.imageUrl ?? item.ImageUrl ?? "";
+        const header = item.headerText ?? item.HeaderText ?? item.header ?? item.Header ?? "";
+        const message = item.contentText ?? item.ContentText ?? item.message ?? item.Message ?? "";
+
+        return {
+          // The game uses NewsType to separate regular news from videos.
+          Id: Number.isFinite(Number(item.id ?? item.Id))
+            ? Number(item.id ?? item.Id)
+            : (timestamp && Number.isFinite(new Date(timestamp).getTime()) ? new Date(timestamp).getTime() : index + 1),
+          TargetUrl: targetUrl,
+          Language: item.language ?? item.Language ?? "en",
+          ImagePath: imagePath,
+          HeaderText: header,
+          ContentText: message,
+          NewsType: String(item.newsType ?? item.NewsType ?? item.type ?? "news").toLowerCase(),
+          Timestamp: timestamp,
+          // Keep aliases for older NewsData clients.
+          Header: header,
+          Message: message,
+          TimeStamp: timestamp,
+          imagePath,
+          link: targetUrl
+        };
+      });
 
       res.json(news);
     } catch (err) {
@@ -4067,8 +4089,7 @@ static async finish(req, res) {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
-
-
+
 
   static async claimSeasonReward(req, res) {
     try {
@@ -4216,8 +4237,7 @@ static async finish(req, res) {
     }
   }
   
-
-
+
 
 }
 
