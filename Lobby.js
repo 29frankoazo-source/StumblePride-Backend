@@ -938,6 +938,8 @@ const LobbyController = {
 };
 
 function mountLobbyRoutes(app) {
+  app.post("/user/update", LobbyController.updateUsername);
+  app.post("/user/update/", LobbyController.updateUsername);
   app.post("/user/updateusername", LobbyController.updateUsername);
   app.post("/user/updateusername/", LobbyController.updateUsername);
 
