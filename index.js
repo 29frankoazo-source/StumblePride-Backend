@@ -14,7 +14,6 @@ const https = require("https");
 const Console = require("./ConsoleUtils");
 const CryptoUtils = require("./CryptoUtils");
 const SharedUtils = require("./SharedUtils");
-const ProxEncrypt = require("./AntiCheat/ProxEncrypt");
 const { stripClientUsername } = require("./AntiCheat/Username");
 
 let compression = null;
@@ -297,13 +296,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: "2mb" }));
-
-// ClientLoader-only gate: rejects requests without valid x-prox-encrypt (see AntiCheat/ProxEncrypt.js)
-app.use(
-  ProxEncrypt.middleware({
-    exclusions: ["/", "/health", "/photon/auth", "/api/v1/ping"]
-  })
-);
 
 // Anti-spoof: drop client Username/Nickname body fields (Mongo is source of truth)
 app.use(stripClientUsername);
