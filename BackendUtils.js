@@ -2998,7 +2998,15 @@ class NewsController {
       const news = newsList.map((item, index) => {
         const timestamp = item.timestamp ?? item.Timestamp ?? item.timeStamp ?? item.TimeStamp ?? null;
         const targetUrl = item.targetUrl ?? item.TargetUrl ?? item.link ?? item.Link ?? "";
-        const imagePath = item.imagePath ?? item.ImagePath ?? item.imageUrl ?? item.ImageUrl ?? "";
+        let youtubeVideoId = "";
+        try {
+          const target = new URL(targetUrl);
+          if (target.hostname === "youtu.be") youtubeVideoId = target.pathname.slice(1).split("/")[0];
+          else if (["youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"].includes(target.hostname)) {
+            youtubeVideoId = target.searchParams.get("v") || target.pathname.match(/^\/(?:shorts|embed)\/([^/]+)/)?.[1] || "";
+          }
+        } catch { /* Ignore malformed or non-YouTube links. */ }
+        const imagePath = item.imagePath ?? item.ImagePath ?? item.imageUrl ?? item.ImageUrl ?? (youtubeVideoId ? "https://img.youtube.com/vi/" + youtubeVideoId + "/hqdefault.jpg" : "");
         const header = item.headerText ?? item.HeaderText ?? item.header ?? item.Header ?? "";
         const message = item.contentText ?? item.ContentText ?? item.message ?? item.Message ?? "";
 
@@ -3022,6 +3030,29 @@ class NewsController {
           link: targetUrl
         };
       });
+
+      const videoUrl = "https://www.youtube.com/watch?v=e1q-TuHdc4Y";
+      if (!news.some(item => item.TargetUrl === videoUrl || item.link === videoUrl)) {
+        const timestamp = new Date();
+        const title = "StumblePride Video";
+        const thumbnail = "https://img.youtube.com/vi/e1q-TuHdc4Y/hqdefault.jpg";
+        news.push({
+          Id: timestamp.getTime(),
+          TargetUrl: videoUrl,
+          Language: "en",
+          ImagePath: thumbnail,
+          HeaderText: title,
+          ContentText: "",
+          NewsType: "video",
+          Timestamp: timestamp.toISOString(),
+          Header: title,
+          Message: "",
+          TimeStamp: timestamp.toISOString(),
+          imagePath: thumbnail,
+          link: videoUrl
+        });
+        news.sort((a, b) => new Date(b.Timestamp || b.TimeStamp || 0) - new Date(a.Timestamp || a.TimeStamp || 0));
+      }
 
       res.json(news);
     } catch (err) {
