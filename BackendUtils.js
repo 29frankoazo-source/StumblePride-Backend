@@ -3032,27 +3032,35 @@ class NewsController {
       });
 
       const videoUrl = "https://www.youtube.com/watch?v=e1q-TuHdc4Y";
-      if (!news.some(item => item.TargetUrl === videoUrl || item.link === videoUrl)) {
-        const timestamp = new Date();
-        const title = "StumblePride Video";
-        const thumbnail = "https://img.youtube.com/vi/e1q-TuHdc4Y/hqdefault.jpg";
+      const videoTimestamp = "2026-10-20T19:00:00.000Z";
+      const videoTitle = "StumblePride Video";
+      const videoThumbnail = "https://img.youtube.com/vi/e1q-TuHdc4Y/hqdefault.jpg";
+      const existingVideo = news.find(item => item.TargetUrl === videoUrl || item.link === videoUrl);
+
+      if (existingVideo) {
+        existingVideo.NewsType = "video";
+        existingVideo.HeaderText = existingVideo.HeaderText || videoTitle;
+        existingVideo.Header = existingVideo.Header || videoTitle;
+        existingVideo.ImagePath = existingVideo.ImagePath || videoThumbnail;
+        existingVideo.imagePath = existingVideo.imagePath || videoThumbnail;
+      } else {
         news.push({
-          Id: timestamp.getTime(),
+          Id: Date.parse(videoTimestamp),
           TargetUrl: videoUrl,
           Language: "en",
-          ImagePath: thumbnail,
-          HeaderText: title,
+          ImagePath: videoThumbnail,
+          HeaderText: videoTitle,
           ContentText: "",
           NewsType: "video",
-          Timestamp: timestamp.toISOString(),
-          Header: title,
+          Timestamp: videoTimestamp,
+          Header: videoTitle,
           Message: "",
-          TimeStamp: timestamp.toISOString(),
-          imagePath: thumbnail,
+          TimeStamp: videoTimestamp,
+          imagePath: videoThumbnail,
           link: videoUrl
         });
-        news.sort((a, b) => new Date(b.Timestamp || b.TimeStamp || 0) - new Date(a.Timestamp || a.TimeStamp || 0));
       }
+      news.sort((a, b) => new Date(b.Timestamp || b.TimeStamp || 0) - new Date(a.Timestamp || a.TimeStamp || 0));
 
       res.json(news);
     } catch (err) {
