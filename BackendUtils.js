@@ -14,7 +14,7 @@ const SharedData = require("./shared.json");
 
 
 const isAllSkinsUnlocked = false;
-const isAllEmotesUnlocked = false;
+const isAllEmotesUnlocked = true;
 const isAllAnimationsUnlocked = true;
 const isAllFootstepsUnlocked = true;
 const isAllActionEmotesUnlocked = true;
@@ -4067,7 +4067,8 @@ static async finish(req, res) {
       res.status(500).json({ message: 'Internal server error' });
     }
   }
-
+
+
 
   static async claimSeasonReward(req, res) {
     try {
@@ -4215,7 +4216,8 @@ static async finish(req, res) {
     }
   }
   
-
+
+
 
 }
 
