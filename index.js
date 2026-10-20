@@ -296,6 +296,8 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.text({ type: "text/plain", limit: "2mb" }));
 
 // Anti-spoof: drop client Username/Nickname body fields (Mongo is source of truth)
 app.use(stripClientUsername);

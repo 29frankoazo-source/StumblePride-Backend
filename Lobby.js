@@ -397,8 +397,10 @@ const LobbyController = {
       const user = await requireUser(req, res);
       if (!user) return;
 
-      const rawInput = pickRequestedUsername(req.body);
+      const rawInput = pickRequestedUsername(req.body) ?? pickRequestedUsername(req.query);
       if (!rawInput || !String(rawInput).trim()) {
+        const bodyKeys = req.body && typeof req.body === "object" ? Object.keys(req.body).join(",") : typeof req.body;
+        console.warn("[LOBBY] username missing; content-type=", req.get("content-type"), "body-keys=", bodyKeys);
         logLobby("updateusername", false, "empty", Date.now() - t0);
         return res.status(409).json({ message: "nome non disponibile" });
       }
