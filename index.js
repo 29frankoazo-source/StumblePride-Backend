@@ -300,7 +300,11 @@ app.use(express.urlencoded({ extended: true, limit: "2mb" }));
 app.use(express.text({ type: "text/plain", limit: "2mb" }));
 
 // Anti-spoof: drop client Username/Nickname body fields (Mongo is source of truth)
-app.use(stripClientUsername);
+app.use((req, res, next) => {
+  const pathname = String(req.path || "").replace(/\/+$/, "").toLowerCase();
+  if (pathname === "/user/update") return next();
+  return stripClientUsername(req, res, next);
+});
 
 // (Log richieste disattivato per evitare spam nei log)
 // Se vuoi riattivarlo, decommenta il blocco seguente.
